@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone_Book.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone_Book.iml" group="Phone_Book" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" group="Phone_Book/Phone_Book-task" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" group="Phone_Book/Phone_Book-task" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_test.iml" group="Phone_Book/Phone_Book-task" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util.iml" group="Phone_Book/util" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util_main.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util_main.iml" group="Phone_Book/util" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util_test.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util_test.iml" group="Phone_Book/util" />
+    </modules>
+  </component>
+</project>
