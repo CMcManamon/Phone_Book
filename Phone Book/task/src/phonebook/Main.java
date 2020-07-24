@@ -74,7 +74,7 @@ class Directory {
 
     public void sortDirectory(SortType method) {
         if (method == SortType.BUBBLE) {
-            BubbleSort.sort(entries);
+            BubbleSort.sort(this);
         }
 
         // save to file
@@ -127,8 +127,47 @@ class JumpSearch implements SearchMethod {
 
     @Override
     public boolean isListed(Directory directory, Person person) {
+        int prevRight = 0;
+        int currentRight = 0;
 
-        return true;
+        List<Entry> list = directory.getEntries();
+
+        if (list.size() == 0) {
+            return false;
+        }
+
+        if (list.get(0).getName().equals(person.getName())) {
+            return true;
+        }
+
+        int jumpLength = (int) Math.sqrt(list.size());
+
+        while (currentRight < list.size() - 1) {
+            currentRight = Math.min(list.size() - 1, currentRight + jumpLength);
+
+            if (list.get(currentRight).getName().compareTo(person.getName()) >= 0) {
+                break; // possible block found
+            }
+
+            prevRight = currentRight;
+        }
+
+        if ((currentRight == list.size() - 1) &&
+                person.getName().compareTo(list.get(currentRight).getName()) > 0) {
+            return false; // beyond scope
+        }
+
+        return backwardSearch(list, person, prevRight, currentRight);
+    }
+
+    public static boolean backwardSearch(List<Entry> list, Person person,
+                                         int leftExcl, int rightIncl) {
+        for (int i = rightIncl; i > leftExcl; i--) {
+            if (list.get(i).getName().equals(person.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -139,25 +178,28 @@ class JumpSearch implements SearchMethod {
 
 abstract class BubbleSort {
 
-    public static void sort(List<Entry> list) {
-        long count = 0;
-        for (int i = 0; i < list.size() - 1; i++) {
+    public static void sort(Directory directory) {
+        List<Entry> list = directory.getEntries();
+        long allowedTime = 1000 * 60 * 60; // remove this later
 
+        long startTime = System.currentTimeMillis();
+        long runTime = startTime;
+        for (int i = 0; i < list.size() - 1; i++) {
             for (int j = 0; j < list.size() - i - 1; j++) {
                 if (list.get(j).compareName(list.get(j + 1)) > 0) {
-                    count++;
-            //        Entry temp = list.get(j);
-             //       list.set(j, list.get(j + 1));
-               //     list.set(j + 1, temp);
+                    Entry temp = list.get(j);
+                    list.set(j, list.get(j + 1));
+                    list.set(j + 1, temp);
+                }
+
+                runTime = System.currentTimeMillis();
+                if (runTime - startTime > allowedTime) { // taking too long
+                    directory.setSorted(true); // remove this later
+                    return;
                 }
             }
-            if (i <= 1) {
-                System.out.println(count + " of " + list.size());
-                count = 0;
-            }
-
         }
-//        directory.setSorted(true);
+        directory.setSorted(true);
     }
 }
 

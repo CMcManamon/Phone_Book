@@ -71,45 +71,10 @@ files:
     \ less than the first linear search time.\");\n            }\n        }\n    \
     \    \n        return CheckResult.correct();\n    }\n}\n"
   learner_created: false
-- name: src/phonebook/SearchManager$1.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/SearchMethod.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/LinearSearch.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/Entry.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/Person.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/JumpSearch.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/Directory.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/SearchManager.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/SearchType.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/SortType.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/BubbleSort.class
-  visible: true
-  learner_created: true
-- name: src/phonebook/Main.class
-  visible: true
-  learner_created: true
-- name: src/sortedDirectory.txt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/63/stages/341/implement
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations! Continue on <a href="https://hyperskill.org/projects/63/stages/341/implement">JetBrains
+    Academy</a>
+  time: Thu, 23 Jul 2020 21:56:31 UTC
 record: -1
