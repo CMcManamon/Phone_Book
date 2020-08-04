@@ -72,14 +72,14 @@ class Directory {
         sorted = val;
     }
 
-    public void sortDirectory(SortType method) {
-        if (method == SortType.BUBBLE) {
-            BubbleSort.sort(this);
+    public void sortDirectory(SortMethod method, long allowedTime) {
+        if (method != null) {
+            method.sort(this, allowedTime);
         }
 
         // save to file
         if (sorted) {
-            System.out.println("Writing to file");
+            // System.out.println("Writing to file");
             File sortedFile = new File("sortedDirectory.txt");
             try (FileWriter writer = new FileWriter(sortedFile)) {
                 for (int i = 0; i < entries.size(); i++) {
@@ -103,6 +103,36 @@ class Directory {
 interface SearchMethod {
     boolean isListed(Directory directory, Person person);
     String methodName();
+}
+
+class BinarySearch implements SearchMethod {
+
+    @Override
+    public boolean isListed(Directory directory, Person person) {
+
+        List<Entry> list = directory.getEntries();
+        return binarySearch(list, person, 0, list.size() - 1) >= 0;
+    }
+
+    private int binarySearch(List<Entry> list, Person person, int left, int right) {
+
+        if (left > right) { // searched without finding
+            return -1;
+        }
+
+        int mid = left + (right - left) / 2; // middle
+        int compare = list.get(mid).getName().compareTo(person.getName());
+        if (compare == 0) {
+            return mid;
+        } else if (compare < 0) { // search right
+            return binarySearch(list, person, mid + 1, right);
+        } else { // search left
+            return binarySearch(list, person, left, mid - 1);
+        }
+    }
+
+    @Override
+    public String methodName() { return "quick sort + binary search";}
 }
 
 class LinearSearch implements SearchMethod {
@@ -176,11 +206,55 @@ class JumpSearch implements SearchMethod {
     }
 }
 
-abstract class BubbleSort {
+abstract class SortMethod {
+    abstract void sort(Directory directory, long allowedTime);
+}
 
-    public static void sort(Directory directory) {
+class QuickSort extends SortMethod {
+
+    public void sort(Directory directory, long allowedTime) {
         List<Entry> list = directory.getEntries();
-        long allowedTime = 1000 * 60 * 60; // remove this later
+
+
+        quickSort(directory, 0, list.size() - 1);
+
+        directory.setSorted(true);
+    }
+
+    private void quickSort(Directory directory, int left, int right) {
+        // choose a pivot element (rightmost)
+        // reorder array with smaller values on left
+        // recursively sort the subarrays
+        if (left < right) {
+            int pivotIndex = partition(directory, left, right);
+            quickSort(directory, left, pivotIndex - 1);
+            quickSort(directory, pivotIndex + 1, right);
+        }
+    }
+
+    private static int partition(Directory directory, int left, int right) {
+        List<Entry> list = directory.getEntries();
+        String pivot = list.get(right).getName();
+        int partitionIndex = left;
+
+        // swap smaller with larger values
+        for (int i = left; i < right; i++) {
+            if (list.get(i).getName().compareTo(pivot) < 0) {
+                directory.swap(i, partitionIndex);
+                partitionIndex++;
+            }
+        }
+
+        directory.swap(right, partitionIndex);
+
+        return partitionIndex;
+    }
+}
+
+class BubbleSort extends SortMethod {
+
+    public void sort(Directory directory, long allowedTime) {
+        List<Entry> list = directory.getEntries();
 
         long startTime = System.currentTimeMillis();
         long runTime = startTime;
@@ -194,7 +268,6 @@ abstract class BubbleSort {
 
                 runTime = System.currentTimeMillis();
                 if (runTime - startTime > allowedTime) { // taking too long
-                    directory.setSorted(true); // remove this later
                     return;
                 }
             }
@@ -203,26 +276,38 @@ abstract class BubbleSort {
     }
 }
 
-enum SearchType {LINEAR, JUMP}
-enum SortType {BUBBLE}
+enum SearchType {LINEAR, JUMP, BINARY}
+enum SortType {UNSORTED, BUBBLE, QUICK}
 
 class SearchManager {
-    private SearchMethod method;
+    private SearchMethod searchMethod;
     private SearchType searchType;
+    private long maxAllowedTime;
 
+    public long getMaxAllowedTime() {
+        return maxAllowedTime;
+    }
+
+    public void setMaxAllowedTime(long t) {
+        maxAllowedTime = t >= 0 ? t : 0;
+    }
     public void setSearchMethod(SearchType method) {
         searchType = method;
         switch (method) {
             case LINEAR:
-                this.method = new LinearSearch();
+                searchMethod = new LinearSearch();
                 break;
             case JUMP:
-                this.method = new JumpSearch();
+                searchMethod = new JumpSearch();
+                break;
+            case BINARY:
+                searchMethod = new BinarySearch();
                 break;
             default:
                 break;
         }
     }
+
 
     public void runListSearch(Directory directory, List<Person> people) {
 
@@ -234,16 +319,23 @@ class SearchManager {
         int countTried = 0;
         int countFound = 0;
 
-        System.out.println("\nStart searching (" + method.methodName() + ")...");
+        System.out.println("\nStart searching (" + searchMethod.methodName() + ")...");
 
         boolean sortCancelled = false;
         long sortTimeStart = -1;
         long sortTimeEnd = -1;
 
-        if (searchType == SearchType.JUMP) {
+        if (searchType != SearchType.LINEAR) {
             // sort directory
             sortTimeStart = System.currentTimeMillis();
-            directory.sortDirectory(SortType.BUBBLE);
+            SortMethod sortMethod = null;
+            if (searchType == SearchType.JUMP) {
+                sortMethod = new BubbleSort();
+            } else if (searchType == SearchType.BINARY) {
+                sortMethod = new QuickSort();
+            }
+
+            directory.sortDirectory(sortMethod, maxAllowedTime);
 
             // record completion time
             sortTimeEnd = System.currentTimeMillis();
@@ -260,7 +352,7 @@ class SearchManager {
             // search directory for person
             // if name is found in directory, increment count
             countTried++;
-            if (method.isListed(directory, person)) {
+            if (searchMethod.isListed(directory, person)) {
                 countFound++;
             }
         }
@@ -271,6 +363,9 @@ class SearchManager {
             timeTaken += timeTakenString(sortTimeEnd - sortTimeStart
                     + searchTimeEnd - searchTimeStart);
         } else {
+            if (searchType == SearchType.LINEAR) {
+                setMaxAllowedTime(10 * (searchTimeEnd - searchTimeStart));
+            }
             timeTaken += timeTakenString(searchTimeEnd - searchTimeStart);
         }
 
@@ -283,7 +378,7 @@ class SearchManager {
                 sortTimeTaken += " - STOPPED, moved to linear search";
             }
             System.out.printf("Sorting time: %s\n", sortTimeTaken);
-            System.out.printf("Searching time: %s", timeTakenString(searchTimeEnd - searchTimeStart));
+            System.out.printf("Searching time: %s\n", timeTakenString(searchTimeEnd - searchTimeStart));
         }
     }
 
@@ -308,12 +403,22 @@ public class Main {
         String findFilePath = "C:\\Users\\Cmcm8\\IdeaProjects\\find.txt";
         List<Person> people = getPeopleFromFile(findFilePath);
 
+        // Initialize a SearchManager and try a linear search for 'people'
         SearchManager searchManager = new SearchManager();
         searchManager.setSearchMethod(SearchType.LINEAR);
         searchManager.runListSearch(directory, people);
 
+        // try a jump search
         searchManager.setSearchMethod(SearchType.JUMP);
         searchManager.runListSearch(directory, people);
+
+        // Create a fresh unsorted directory to observe sort and search times
+        Directory directoryTwo = new Directory(directoryPath);
+
+        // try binary search with new directory
+        searchManager.setSearchMethod(SearchType.BINARY);
+        searchManager.runListSearch(directoryTwo, people);
+
     }
 
     public static List<Person> getPeopleFromFile(String filePath) {

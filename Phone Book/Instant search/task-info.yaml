@@ -81,6 +81,9 @@ files:
     \ CheckResult.wrong(\"Your hashtable works slower, than quick sort + binary search.\"\
     );\n        }\n        return CheckResult.correct();\n    }\n}\n"
   learner_created: false
+- name: sortedDirectory.txt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/63/stages/475/implement
 status: Unchecked
 record: -1

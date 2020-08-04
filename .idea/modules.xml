@@ -2,13 +2,18 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone_Book.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone_Book.iml" group="Phone_Book" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" group="Phone_Book/Phone_Book-task" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" group="Phone_Book/Phone_Book-task" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_test.iml" group="Phone_Book/Phone_Book-task" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util.iml" group="Phone_Book/util" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util_main.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util_main.iml" group="Phone_Book/util" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util_test.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util_test.iml" group="Phone_Book/util" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone_Book.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone_Book.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Phone_Book.util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Phone_Book.util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Phone_Book.util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Phone_Book.util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Phone_Book.util.test.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Phone_Book.util.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util_main.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util_main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util_test.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util_test.iml" />
     </modules>
   </component>
 </project>
