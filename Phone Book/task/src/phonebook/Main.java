@@ -8,6 +8,183 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
 
+public class Main {
+    public static void main(String[] args) {
+
+        // import directory
+        String directoryPath = "C:\\Users\\Cmcm8\\IdeaProjects\\directory.txt";
+        Directory directory = new Directory(directoryPath);
+
+        // import persons to search for
+        String findFilePath = "C:\\Users\\Cmcm8\\IdeaProjects\\find.txt";
+        List<Person> people = getPeopleFromFile(findFilePath);
+
+        // Initialize a SearchManager and try a linear search for 'people'
+        SearchManager searchManager = new SearchManager();
+        searchManager.setSearchMethod(SearchType.LINEAR);
+        searchManager.runListSearch(directory, people);
+
+        // try a jump search
+        searchManager.setSearchMethod(SearchType.JUMP);
+        searchManager.runListSearch(directory, people);
+
+        // Create a fresh unsorted directory to observe sort and search times
+        directory = new Directory(directoryPath);
+
+        // try binary search with new directory
+        searchManager.setSearchMethod(SearchType.BINARY);
+        searchManager.runListSearch(directory, people);
+
+        // Create a fresh unsorted directory to observe use of hash table
+        directory = new Directory(directoryPath);
+
+        // fill and search a hash table
+        searchManager.setSearchMethod(SearchType.HASH);
+        searchManager.runListSearch(directory, people);
+    }
+
+    public static List<Person> getPeopleFromFile(String filePath) {
+        List<Person> people = new ArrayList<Person>();
+
+        try (Scanner scanner = new Scanner(new File(filePath))) {
+
+            while (scanner.hasNext()) {
+                String name = scanner.nextLine().trim();
+                people.add(new Person(name));
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found: " + filePath);
+        }
+
+        return people;
+
+    }
+} // end Main
+
+/* SearchManager */
+enum SearchType {LINEAR, JUMP, BINARY, HASH}
+
+class SearchManager {
+    private SearchMethod searchMethod;
+    private SearchType searchType;
+    private long maxAllowedTime;
+
+    public long getMaxAllowedTime() {
+        return maxAllowedTime;
+    }
+
+    public void setMaxAllowedTime(long t) {
+        maxAllowedTime = t >= 0 ? t : 0;
+    }
+    public void setSearchMethod(SearchType method) {
+        searchType = method;
+        switch (method) {
+            case LINEAR:
+                searchMethod = new LinearSearch();
+                break;
+            case JUMP:
+                searchMethod = new JumpSearch();
+                break;
+            case BINARY:
+                searchMethod = new BinarySearch();
+                break;
+            case HASH:
+                searchMethod = new HashSearch();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void runListSearch(Directory directory, List<Person> people) {
+
+        if (searchType == null) {
+            System.out.println("Error: Search algorithm not set.");
+            return;
+        }
+
+        int countTried = 0;
+        int countFound = 0;
+
+        System.out.println("\nStart searching (" + searchMethod.methodName() + ")...");
+
+        boolean sortCancelled = false;
+        long sortTimeStart = -1;
+        long sortTimeEnd = -1;
+
+        if (searchType != SearchType.LINEAR) {
+            // sort directory
+            sortTimeStart = System.currentTimeMillis();
+            SortMethod sortMethod = null;
+            if (searchType == SearchType.JUMP) {
+                sortMethod = new BubbleSort();
+            } else if (searchType == SearchType.BINARY) {
+                sortMethod = new QuickSort();
+            } else if (searchType == SearchType.HASH) {
+                sortMethod = new HashSort();
+            }
+
+            // perform sort
+                directory.sortDirectory(sortMethod, maxAllowedTime);
+
+
+
+            // record completion time
+            sortTimeEnd = System.currentTimeMillis();
+
+            if (!directory.isSorted() && searchType != SearchType.HASH) {
+                // stop and do a linear search
+                setSearchMethod(SearchType.LINEAR);
+                sortCancelled = true;
+            }
+        }
+
+        long searchTimeStart = System.currentTimeMillis();
+        for (Person person : people) {
+            // search directory for person
+            // if name is found in directory, increment count
+            countTried++;
+            if (searchMethod.isListed(directory, person)) {
+                countFound++;
+            }
+        }
+
+        long searchTimeEnd = System.currentTimeMillis();
+        String timeTaken = "Time taken: ";
+        if (sortTimeStart > 0) {
+            timeTaken += timeTakenString(sortTimeEnd - sortTimeStart
+                    + searchTimeEnd - searchTimeStart);
+        } else {
+            if (searchType == SearchType.LINEAR) {
+                setMaxAllowedTime(10 * (searchTimeEnd - searchTimeStart));
+            }
+            timeTaken += timeTakenString(searchTimeEnd - searchTimeStart);
+        }
+
+        System.out.printf("Found %d / %d entries. %s\n", countFound, countTried,
+                timeTaken);
+
+        if (sortTimeStart > 0) {
+            String sortTimeTaken = timeTakenString(sortTimeEnd - sortTimeStart);
+            if (sortCancelled) {
+                sortTimeTaken += " - STOPPED, moved to linear search";
+            }
+            String sortMeth = searchType == SearchType.HASH ? "Creating" : "Sorting";
+            System.out.printf("%s time: %s\n", sortMeth, sortTimeTaken);
+            System.out.printf("Searching time: %s\n", timeTakenString(searchTimeEnd - searchTimeStart));
+        }
+    }
+
+    private String timeTakenString(long time) {
+        long min = time / 60_000;
+        long seconds = (time % 60_000) / 1000;
+        long milliseconds = time % 1000;
+
+        return min + " min. " + seconds + " sec. "
+                + milliseconds + " ms.";
+    }
+} // end SearchManager
+
 class Person {
     private final String name;
 
@@ -22,14 +199,14 @@ class Person {
 
 class Entry {
     private final Person person;
-    private final int phoneNumber;
+    private final String phoneNumber;
 
-    public Entry(Person person, int phoneNumber) {
+    public Entry(Person person, String phoneNumber) {
         this.person = person;
         this.phoneNumber = phoneNumber;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -46,12 +223,13 @@ class Directory {
 
     private List<Entry> entries = new ArrayList<Entry>();
     private boolean sorted = false;
+    private HashTable<Entry> entryTable = new HashTable<>(1);
 
     public Directory(String fileName) {
 
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNext()) {
-                int nextNumber = scanner.nextInt();
+                String nextNumber = scanner.next();
                 String name = scanner.nextLine().trim();
                 entries.add(new Entry(new Person(name), nextNumber));
             }
@@ -91,6 +269,7 @@ class Directory {
             }
         }
     }
+
     public void swap(int i, int j) {
         Collections.swap(entries, i, j);
     }
@@ -98,7 +277,21 @@ class Directory {
     public String nameAtIndex(int index) {
         return entries.get(index).getName();
     }
+
+    public void createHashTable() {
+        entryTable = new HashTable<>(entries.size());
+
+        for (Entry entry : entries) {
+            entryTable.put(entry.getName(), entry);
+        }
+    }
+
+    public HashTable<Entry> getTable() {
+        return entryTable;
+    }
 }
+
+// SEARCHING
 
 interface SearchMethod {
     boolean isListed(Directory directory, Person person);
@@ -206,6 +399,24 @@ class JumpSearch implements SearchMethod {
     }
 }
 
+class HashSearch implements SearchMethod {
+
+    @Override
+    public boolean isListed(Directory directory, Person person) {
+        if (directory.getTable().get(person.getName()) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String methodName() {
+        return "hash table";
+    }
+}
+
+// SORTING
+
 abstract class SortMethod {
     abstract void sort(Directory directory, long allowedTime);
 }
@@ -276,165 +487,90 @@ class BubbleSort extends SortMethod {
     }
 }
 
-enum SearchType {LINEAR, JUMP, BINARY}
-enum SortType {UNSORTED, BUBBLE, QUICK}
+class HashSort extends SortMethod {
 
-class SearchManager {
-    private SearchMethod searchMethod;
-    private SearchType searchType;
-    private long maxAllowedTime;
-
-    public long getMaxAllowedTime() {
-        return maxAllowedTime;
-    }
-
-    public void setMaxAllowedTime(long t) {
-        maxAllowedTime = t >= 0 ? t : 0;
-    }
-    public void setSearchMethod(SearchType method) {
-        searchType = method;
-        switch (method) {
-            case LINEAR:
-                searchMethod = new LinearSearch();
-                break;
-            case JUMP:
-                searchMethod = new JumpSearch();
-                break;
-            case BINARY:
-                searchMethod = new BinarySearch();
-                break;
-            default:
-                break;
-        }
-    }
-
-
-    public void runListSearch(Directory directory, List<Person> people) {
-
-        if (searchType == null) {
-            System.out.println("Error: Search algorithm not set.");
-            return;
-        }
-
-        int countTried = 0;
-        int countFound = 0;
-
-        System.out.println("\nStart searching (" + searchMethod.methodName() + ")...");
-
-        boolean sortCancelled = false;
-        long sortTimeStart = -1;
-        long sortTimeEnd = -1;
-
-        if (searchType != SearchType.LINEAR) {
-            // sort directory
-            sortTimeStart = System.currentTimeMillis();
-            SortMethod sortMethod = null;
-            if (searchType == SearchType.JUMP) {
-                sortMethod = new BubbleSort();
-            } else if (searchType == SearchType.BINARY) {
-                sortMethod = new QuickSort();
-            }
-
-            directory.sortDirectory(sortMethod, maxAllowedTime);
-
-            // record completion time
-            sortTimeEnd = System.currentTimeMillis();
-
-            if (!directory.isSorted()) {
-                // stop and do a linear search
-                setSearchMethod(SearchType.LINEAR);
-                sortCancelled = true;
-            }
-        }
-
-        long searchTimeStart = System.currentTimeMillis();
-        for (Person person : people) {
-            // search directory for person
-            // if name is found in directory, increment count
-            countTried++;
-            if (searchMethod.isListed(directory, person)) {
-                countFound++;
-            }
-        }
-
-        long searchTimeEnd = System.currentTimeMillis();
-        String timeTaken = "Time taken: ";
-        if (sortTimeStart > 0) {
-            timeTaken += timeTakenString(sortTimeEnd - sortTimeStart
-                    + searchTimeEnd - searchTimeStart);
-        } else {
-            if (searchType == SearchType.LINEAR) {
-                setMaxAllowedTime(10 * (searchTimeEnd - searchTimeStart));
-            }
-            timeTaken += timeTakenString(searchTimeEnd - searchTimeStart);
-        }
-
-        System.out.printf("Found %d / %d entries. %s\n", countFound, countTried,
-                timeTaken);
-
-        if (sortTimeStart > 0) {
-            String sortTimeTaken = timeTakenString(sortTimeEnd - sortTimeStart);
-            if (sortCancelled) {
-                sortTimeTaken += " - STOPPED, moved to linear search";
-            }
-            System.out.printf("Sorting time: %s\n", sortTimeTaken);
-            System.out.printf("Searching time: %s\n", timeTakenString(searchTimeEnd - searchTimeStart));
-        }
-    }
-
-    private String timeTakenString(long time) {
-        long min = time / 60_000;
-        long seconds = (time % 60_000) / 1000;
-        long milliseconds = time % 1000;
-
-        return min + " min. " + seconds + " sec. "
-                + milliseconds + " ms.";
+    public void sort(Directory directory, long allowedTime) {
+        // create a hash table from directory entries
+        directory.createHashTable();
     }
 }
 
-public class Main {
-    public static void main(String[] args) {
+// HASH TABLE
 
-        // import directory
-        String directoryPath = "C:\\Users\\Cmcm8\\IdeaProjects\\directory.txt";
-        Directory directory = new Directory(directoryPath);
+class TableEntry<T> {
+    private final String key;
+    private final T value;
 
-        // import persons to search for
-        String findFilePath = "C:\\Users\\Cmcm8\\IdeaProjects\\find.txt";
-        List<Person> people = getPeopleFromFile(findFilePath);
-
-        // Initialize a SearchManager and try a linear search for 'people'
-        SearchManager searchManager = new SearchManager();
-        searchManager.setSearchMethod(SearchType.LINEAR);
-        searchManager.runListSearch(directory, people);
-
-        // try a jump search
-        searchManager.setSearchMethod(SearchType.JUMP);
-        searchManager.runListSearch(directory, people);
-
-        // Create a fresh unsorted directory to observe sort and search times
-        Directory directoryTwo = new Directory(directoryPath);
-
-        // try binary search with new directory
-        searchManager.setSearchMethod(SearchType.BINARY);
-        searchManager.runListSearch(directoryTwo, people);
-
+    public TableEntry(String key, T value) {
+        this.key = key;
+        this.value = value;
     }
 
-    public static List<Person> getPeopleFromFile(String filePath) {
-        List<Person> people = new ArrayList<Person>();
+    public String getKey() {
+        return key;
+    }
 
-        try (Scanner scanner = new Scanner(new File(filePath))) {
-
-            while (scanner.hasNext()) {
-                String name = scanner.nextLine().trim();
-                people.add(new Person(name));
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: File not found: " + filePath);
-        }
-
-        return people;
-
+    public T getValue() {
+        return value;
     }
 }
+
+class HashTable<T> {
+    private int size;
+    private TableEntry[] table;
+
+    public HashTable(int size) {
+        this.size = size;
+        table = new TableEntry[size];
+    }
+
+    public boolean put(String key, T value) {
+        int index = findKey(key);
+
+        if (index == -1) {
+            return false;
+        }
+
+        table[index] = new TableEntry(key, value);
+        return true;
+    }
+
+    public T get(String key) {
+        int index = findKey(key);
+        if (index == -1 || table[index] == null) {
+            return null;
+        }
+
+        return (T) table[index].getValue();
+    }
+
+    private int findKey(String keyString) {
+        int key = code(keyString);
+        int hash = key % size;
+
+        while (table[hash] != null && code(table[hash].getKey()) != key) {
+            hash = (hash + 1) % size;
+
+            if (hash == key % size) {
+                return -1;
+            }
+        }
+
+        return hash;
+    }
+
+    private int code(String keyString) {
+        int sum = 0;
+        // formula to create a key from each name
+        char[] key = keyString.toCharArray();
+        for (char c : key) {
+            sum += (int) c;
+        }
+        sum += key[0] * key[key.length - 1];
+        return sum;
+    }
+}
+
+
+
+
