@@ -3,16 +3,22 @@
 
 "Start searching (linear search)...
 Found 500 / 500
- entries. !Time taken: 0 min. 2 sec. 430 ms.
+ entries. !Time taken: 0 min. 3 sec. 647 ms.
 
 .Start searching (bubble sort + jump search)...
 Found 500 / 500
- entries. "Time taken: 0 min. 26 sec. 744 ms.
-Sorting time: 80 min. 24 sec. 304 ms. - STOPPED, moved to linear search
-Searching time: 0 min. 2 sec. 440 ms.
+ entries. "Time taken: 0 min. 40 sec. 115 ms.
+Sorting time: 80 min. 36 sec. 472 ms. - STOPPED, moved to linear search
+Searching time: 0 min. 3 sec. 643 ms.
 
 /Start searching (quick sort + binary search)...
 Found 500 / 500
- entries. !Time taken: 0 min. 1 sec. 174 ms.
-Sorting time: 0 min. 1 sec. 174 ms.
+ entries. !Time taken: 0 min. 1 sec. 371 ms.
+Sorting time: 0 min. 1 sec. 365 ms.
+Searching time: 0 min. 0 sec. 6 ms.
+
+Start searching (hash table)...
+Found 500 / 500
+ entries. !Time taken: 0 min. 0 sec. 247 ms.
+Creating time: 0 min. 0 sec. 247 ms.
 Searching time: 0 min. 0 sec. 0 ms.

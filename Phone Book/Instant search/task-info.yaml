@@ -85,8 +85,9 @@ files:
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/63/stages/475/implement
-status: Unchecked
+status: Solved
 feedback:
-  message: Gradle project isn't imported
-  time: Wed, 05 Aug 2020 05:09:44 UTC
+  message: Congratulations! Continue on <a href="https://hyperskill.org/projects/63/stages/475/implement">JetBrains
+    Academy</a>
+  time: Wed, 05 Aug 2020 05:24:36 UTC
 record: -1

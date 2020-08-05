@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone_Book.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone_Book.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book-task_main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Phone Book/task/Phone_Book.Phone_Book-task.main.iml" />
