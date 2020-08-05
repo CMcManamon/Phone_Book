@@ -1,4 +1,5 @@
 package phonebook;
+
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileWriter;
@@ -7,6 +8,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
+
+// This program imports a large directory containing names and phone numbers
+// It uses various algorithms to sort and search the data
+// The output is the time it takes to search for a collection of 500 names.
 
 public class Main {
     public static void main(String[] args) {
@@ -44,7 +49,7 @@ public class Main {
     }
 
     public static List<Person> getPeopleFromFile(String filePath) {
-        List<Person> people = new ArrayList<Person>();
+        List<Person> people = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(new File(filePath))) {
 
@@ -221,7 +226,7 @@ class Entry {
 
 class Directory {
 
-    private List<Entry> entries = new ArrayList<Entry>();
+    private List<Entry> entries = new ArrayList<>();
     private boolean sorted = false;
     private HashTable<Entry> entryTable = new HashTable<>(1);
 
@@ -289,7 +294,7 @@ class Directory {
     public HashTable<Entry> getTable() {
         return entryTable;
     }
-}
+} // end Directory
 
 // SEARCHING
 
@@ -403,10 +408,7 @@ class HashSearch implements SearchMethod {
 
     @Override
     public boolean isListed(Directory directory, Person person) {
-        if (directory.getTable().get(person.getName()) != null) {
-            return true;
-        }
-        return false;
+        return directory.getTable().get(person.getName()) != null;
     }
 
     @Override
